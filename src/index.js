@@ -1,4 +1,4 @@
-class Kitten {
+export default class Kitten {
   constructor() {
     this.name = 'Peanut';
   }
@@ -6,5 +6,3 @@ class Kitten {
     console.log('meow');
   }
 }
-
-module.exports = Kitten;
