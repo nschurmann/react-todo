@@ -1,31 +1,34 @@
 import _ from 'ramda';
 import {Maybe} from 'ramda-fantasy';
 
-let log = (x, y) => console.log(x, y);
+let log = (x, y) => console.log(x);
 
-// getItem :: storage, item -> string
-let getItem = _.curry((storage, x) => storage.getItem(x));
+// getItem :: string -> string
+let getItems = x => localStorage.getItem(x);
 
 // parse :: string -> json
-let parse = (x) => x ? JSON.parse(x): null;
+let parse = x => x ? JSON.parse(x): null;
 
 // stringify :: json -> string
-let stringify = (x) => JSON.stringify(x);
+let stringify = x => JSON.stringify(x);
 
-// setItem :: storage, string, jsonStringified
-let setItem = _.curry((storage, x, y) => storage.setItem(x, y));
+// setItem :: string -> jsonStringified -> undefined
+let setItems = x => y => localStorage.setItem(x, y);
+
+// addItem :: string -> f(todo) -> string
+let addItem = todo => _.compose(stringify, _.append(todo), parse);
+
+// createItem :: string ->f(g(x)) -> f(b)
+let createItem = items => todo => _.compose(setItems(items), addItem(todo), getItems);
 
 export default class todo {
 
-  constructor(storage = localStorage){
-    this.name = 'name';
-    this.storage = storage;
-    this.storage.getItem('todos') ? '' : this.storage.setItem('todos', '');
+  constructor(){
+    getItems('todos') ? undefined : setItems('todos')('');
   }
 
-  create(todo) {
-    this.new = _.compose(_.map(_.compose(setItem(this.storage, 'todos'), stringify, _.append(todo), parse)), Maybe, getItem(this.storage));
-    this.new('todos');
+  create(myTodo) {
+    createItem('todos')(myTodo)('todos');
   }
 
   show() {
