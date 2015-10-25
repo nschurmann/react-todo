@@ -1,27 +1,30 @@
 import _ from 'ramda';
 import {Maybe} from 'ramda-fantasy';
 
-let log = (x, y) => console.log(x);
+const log = (x, y) => console.log(x);
 
 // getItem :: string -> string
-let getItems = x => localStorage.getItem(x);
+const getItems = x => localStorage.getItem(x);
 
 // parse :: string -> json
-let parse = x => JSON.parse(x);
+const parse = x => JSON.parse(x);
 
 // stringify :: json -> string
-let stringify = x => JSON.stringify(x);
+const stringify = x => JSON.stringify(x);
 
 // setItem :: string -> f(jsonStringified) -> undefined
-let setItems = x => y => localStorage.setItem(x, y);
+const setItems = x => y => localStorage.setItem(x, y);
 
 // addItem :: string -> f(x) -> string
-let addItem = x => _.compose(stringify, _.append(x), parse);
+const addItem = x => _.compose(stringify, _.append(x), parse);
 
 // addNSet :: Object -> f(string) -> undefined
-let addNSet = x => y => _.compose(setItems(x), addItem(y));
+const addNSet = x => y => _.compose(setItems(x), addItem(y));
 
-// createItem :: string ->f(g(x)) -> f(b)
-let createItem = key => value => _.compose(_.map(addNSet(key)(value)), Maybe, getItems);
+// _createItem :: string ->f(g(x)) -> f(b)
+const _createItem = key => value => _.compose(_.map(addNSet(key)(value)), Maybe, getItems);
+
+// createItem Facade :: (key, value) => undefined
+const createItem = (key, value) => _createItem(key)(value)(key);
 
 export {createItem};
